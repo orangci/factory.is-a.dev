@@ -75,7 +75,7 @@ export function SubdomainChecker() {
     }
 
     // Check if subdomain is alphanumeric, lowercase with optional dashes
-    const pattern = /^(?!.*--)[a-z0-9-]+$/
+    const pattern = /^(?!.*--)[a-z0-9-.]+$/
     if (!pattern.test(subdomain)) {
       setError("The subdomain name must be alphanumeric, lowercase, and may contain dashes.")
       setIsAvailable(null)
