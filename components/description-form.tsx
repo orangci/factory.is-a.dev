@@ -24,11 +24,13 @@ export function DescriptionForm({ data, updateData, onNext, onBack }: Descriptio
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Additional Information</CardTitle>
-        <CardDescription>Provide optional details about your subdomain</CardDescription>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">Additional Information</CardTitle>
+        <CardDescription className="text-sm sm:text-base">
+          Provide optional details about your subdomain
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-4 sm:px-6">
         <div className="space-y-2">
           <Label htmlFor="description">Description (optional)</Label>
           <Input
@@ -52,12 +54,12 @@ export function DescriptionForm({ data, updateData, onNext, onBack }: Descriptio
           />
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between px-4 sm:px-6">
+        <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <Button onClick={onNext} className="bg-accent hover:bg-hover-accent text-accent-foreground">
+        <Button onClick={onNext} className="w-full sm:w-auto bg-accent hover:bg-hover-accent text-accent-foreground">
           Next
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>

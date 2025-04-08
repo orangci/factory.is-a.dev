@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, Copy, Download } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface JsonPreviewProps {
   data: any
@@ -88,13 +89,13 @@ export function JsonPreview({ data, onBack }: JsonPreviewProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Your JSON</CardTitle>
-        <CardDescription>Your subdomain configuration is ready</CardDescription>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">Your JSON</CardTitle>
+        <CardDescription className="text-sm sm:text-base">Your subdomain configuration is ready</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-4 sm:px-6">
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <p className="text-sm font-medium text-body-fg">
               File path: <code className="bg-background/30 px-1 py-0.5 rounded">{getFilePath()}</code>
             </p>
@@ -111,9 +112,11 @@ export function JsonPreview({ data, onBack }: JsonPreviewProps) {
           </div>
 
           <div className="relative">
-            <pre className="bg-background/30 p-4 rounded-md overflow-auto max-h-[400px] text-body-fg">
-              <code>{jsonContent}</code>
-            </pre>
+            <ScrollArea className="h-[200px] sm:h-[400px]">
+              <pre className="bg-background/30 p-4 rounded-md overflow-auto text-body-fg">
+                <code>{jsonContent}</code>
+              </pre>
+            </ScrollArea>
           </div>
         </div>
 
@@ -140,8 +143,8 @@ export function JsonPreview({ data, onBack }: JsonPreviewProps) {
           </ol>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <CardFooter className="px-4 sm:px-6">
+        <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>

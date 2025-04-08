@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import { validateRecordValue } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface RecordSelectorProps {
   data: any
@@ -1127,30 +1128,34 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>DNS Records</CardTitle>
-        <CardDescription>Configure the DNS records for your subdomain</CardDescription>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">DNS Records</CardTitle>
+        <CardDescription className="text-sm sm:text-base">Configure the DNS records for your subdomain</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-4 sm:px-6">
         <div className="space-y-2">
           <Label>Record Types</Label>
-          <div className="flex flex-wrap gap-2">
-            {["CNAME", "A", "AAAA", "URL", "MX", "TXT", "NS", "SRV", "CAA", "DS", "TLSA"].map((type) => (
-              <Button
-                key={type}
-                variant={selectedTypes.includes(type as RecordType) ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleRecordTypeToggle(type as RecordType, !selectedTypes.includes(type as RecordType))}
-                className={
-                  selectedTypes.includes(type as RecordType)
-                    ? "bg-accent hover:bg-hover-accent text-accent-foreground"
-                    : ""
-                }
-              >
-                {type}
-              </Button>
-            ))}
-          </div>
+          <ScrollArea className="w-full pb-4">
+            <div className="flex flex-wrap gap-2">
+              {["CNAME", "A", "AAAA", "URL", "MX", "TXT", "NS", "SRV", "CAA", "DS", "TLSA"].map((type) => (
+                <Button
+                  key={type}
+                  variant={selectedTypes.includes(type as RecordType) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() =>
+                    handleRecordTypeToggle(type as RecordType, !selectedTypes.includes(type as RecordType))
+                  }
+                  className={
+                    selectedTypes.includes(type as RecordType)
+                      ? "bg-accent hover:bg-hover-accent text-accent-foreground"
+                      : ""
+                  }
+                >
+                  {type}
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
 
           <div className="flex items-center space-x-2 pt-4">
             <Switch id="proxied" checked={data.proxied} onCheckedChange={toggleProxied} className="switch" />
@@ -1172,16 +1177,16 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
           )}
         </div>
 
-        {renderRecordForms()}
+        <ScrollArea className="h-[50vh] sm:h-auto pr-4">{renderRecordForms()}</ScrollArea>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between px-4 sm:px-6">
+        <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         <Button
           onClick={handleNext}
-          className="bg-accent hover:bg-hover-accent text-accent-foreground"
+          className="w-full sm:w-auto bg-accent hover:bg-hover-accent text-accent-foreground"
           disabled={Object.values(recordErrors).some((error) => error && !error.includes("can only be combined"))}
         >
           Preview JSON

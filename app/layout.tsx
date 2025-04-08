@@ -1,9 +1,14 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: 'factory.is-a.dev',
-  description: 'The is-a.dev subdomain factory.'
+  title: "factory.is-a.dev",
+  description: "Generate your is-a.dev subdomain configuration",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -13,7 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+      </head>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
+
+
+import './globals.css'
