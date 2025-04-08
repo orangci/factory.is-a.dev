@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "factory.is-a.dev",
   description: "Generate your is-a.dev subdomain configuration",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
