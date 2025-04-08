@@ -111,10 +111,10 @@ export function JsonPreview({ data, onBack }: JsonPreviewProps) {
             </div>
           </div>
 
-          <div className="relative">
-            <ScrollArea className="h-[200px] sm:h-[400px]">
-              <pre className="bg-background/30 p-4 rounded-md overflow-auto text-body-fg">
-                <code>{jsonContent}</code>
+          <div className="relative w-full">
+            <ScrollArea className="h-[250px] sm:h-[400px] w-full rounded-md border border-border">
+              <pre className="bg-background/30 p-4 text-body-fg w-full">
+                <code className="whitespace-pre-wrap break-all">{jsonContent}</code>
               </pre>
             </ScrollArea>
           </div>
