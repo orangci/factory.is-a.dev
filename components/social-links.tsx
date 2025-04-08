@@ -61,7 +61,7 @@ export function SocialLinks({ platforms, onChange }: SocialLinksProps) {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
         <div className="col-span-1">
           <Input
             placeholder="Platform (e.g. discord)"

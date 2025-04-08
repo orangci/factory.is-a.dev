@@ -89,11 +89,13 @@ export function UserInfoForm({ data, updateData, onNext, onBack }: UserInfoFormP
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>User Information</CardTitle>
-        <CardDescription>Provide your GitHub username and contact information</CardDescription>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">User Information</CardTitle>
+        <CardDescription className="text-sm sm:text-base">
+          Provide your GitHub username and contact information
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-4 sm:px-6">
         <div className="space-y-2">
           <Label htmlFor="github-username">GitHub Username (required)</Label>
           <Input
@@ -131,15 +133,15 @@ export function UserInfoForm({ data, updateData, onNext, onBack }: UserInfoFormP
 
         <SocialLinks platforms={data.platforms} onChange={(platforms) => updateData({ platforms })} />
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <CardFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between px-4 sm:px-6">
+        <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         <Button
           onClick={handleNext}
           disabled={isCheckingGithub}
-          className="bg-accent hover:bg-hover-accent text-accent-foreground"
+          className="w-full sm:w-auto bg-accent hover:bg-hover-accent text-accent-foreground"
         >
           {isCheckingGithub ? (
             <>

@@ -207,21 +207,25 @@ export function SubdomainChecker() {
       case "subdomain":
         return (
           <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Enter your subdomain</CardTitle>
-              <CardDescription>Check if your desired subdomain is available on is-a.dev</CardDescription>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-xl sm:text-2xl">Enter your subdomain</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
+                Check if your desired subdomain is available on is-a.dev
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-2">
-                <Input
-                  ref={inputRef}
-                  value={data.subdomain}
-                  onChange={(e) => updateData({ subdomain: e.target.value.toLowerCase() })}
-                  onKeyDown={handleKeyDown}
-                  placeholder="example"
-                  className="flex-1"
-                />
-                <span className="text-body-fg">.is-a.dev</span>
+            <CardContent className="px-4 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <div className="w-full sm:flex-1 flex items-center">
+                  <Input
+                    ref={inputRef}
+                    value={data.subdomain}
+                    onChange={(e) => updateData({ subdomain: e.target.value.toLowerCase() })}
+                    onKeyDown={handleKeyDown}
+                    placeholder="example"
+                    className="flex-1"
+                  />
+                  <span className="ml-2 text-body-fg">.is-a.dev</span>
+                </div>
               </div>
 
               {error && (
@@ -245,11 +249,11 @@ export function SubdomainChecker() {
                 </Alert>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end">
+            <CardFooter className="flex justify-end px-4 sm:px-6 pt-2">
               <Button
                 onClick={() => validateAndCheckSubdomain()}
                 disabled={isChecking || !data.subdomain || isAvailable === false}
-                className="bg-accent hover:bg-hover-accent text-accent-foreground"
+                className="w-full sm:w-auto bg-accent hover:bg-hover-accent text-accent-foreground"
               >
                 {isChecking ? (
                   <>
