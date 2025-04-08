@@ -1,6 +1,6 @@
 ### factory.is-a.dev
 
-A webpage for generating [is-a.dev](https://is-a.dev) subdomain JSON files. Built with Next.js, Tailwind CSS, and shadcn/ui.
+A webpage for generating [is-a.dev](https://is-a.dev) subdomain JSON files. Built with Next.js, Tailwind CSS, and shadcn/ui. The official instance of this project is hosted on Vercel [here](https://factory.is-a.dev).
 
 ## Selfhosting
 

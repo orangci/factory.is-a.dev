@@ -27,6 +27,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   const [recordErrors, setRecordErrors] = useState<Record<string, string>>({})
   const [showRedirectConfig, setShowRedirectConfig] = useState(false)
   const [noRecordError, setNoRecordError] = useState<string | null>(null)
+  const [emptyValueErrors, setEmptyValueErrors] = useState<Record<string, boolean>>({})
 
   // Initialize selected types from data
   useEffect(() => {
@@ -45,17 +46,24 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       if (data.records.TLSA) types.push("TLSA")
     }
     setSelectedTypes(types)
+
+    // Initialize showRedirectConfig based on whether URL is selected
+    if (types.includes("URL")) {
+      setShowRedirectConfig(true)
+    }
   }, [])
 
   // Initialize redirect_config if URL is selected
   useEffect(() => {
-    if (selectedTypes.includes("URL") && !data.redirect_config) {
-      updateData({
-        redirect_config: {
-          custom_paths: {},
-          redirect_paths: false,
-        },
-      })
+    if (selectedTypes.includes("URL")) {
+      if (!data.redirect_config) {
+        updateData({
+          redirect_config: {
+            custom_paths: {},
+            redirect_paths: false,
+          },
+        })
+      }
       setShowRedirectConfig(true)
     }
   }, [selectedTypes])
@@ -119,11 +127,13 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       delete newErrors[type]
       setRecordErrors(newErrors)
 
-      // If URL is removed, remove redirect_config
-      if (type === "URL" && data.redirect_config) {
-        const newData = { ...data }
-        delete newData.redirect_config
-        updateData(newData)
+      // Clear empty value errors for this record type
+      const newEmptyErrors = { ...emptyValueErrors }
+      delete newEmptyErrors[type]
+      setEmptyValueErrors(newEmptyErrors)
+
+      // If URL is removed, don't remove redirect_config, just hide it
+      if (type === "URL") {
         setShowRedirectConfig(false)
       }
     }
@@ -191,6 +201,15 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       setRecordErrors(newErrors)
     }
 
+    // Check for empty value
+    if (!value.trim()) {
+      setEmptyValueErrors({ ...emptyValueErrors, CNAME: true })
+    } else {
+      const newEmptyErrors = { ...emptyValueErrors }
+      delete newEmptyErrors.CNAME
+      setEmptyValueErrors(newEmptyErrors)
+    }
+
     updateData({ records: { ...data.records, CNAME: value } })
   }
 
@@ -205,10 +224,28 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       setRecordErrors(newErrors)
     }
 
+    // Check for empty value
+    if (!value.trim()) {
+      setEmptyValueErrors({ ...emptyValueErrors, URL: true })
+    } else {
+      const newEmptyErrors = { ...emptyValueErrors }
+      delete newEmptyErrors.URL
+      setEmptyValueErrors(newEmptyErrors)
+    }
+
     updateData({ records: { ...data.records, URL: value } })
   }
 
   const handleTXTChange = (value: string) => {
+    // Check for empty value
+    if (!value.trim()) {
+      setEmptyValueErrors({ ...emptyValueErrors, TXT: true })
+    } else {
+      const newEmptyErrors = { ...emptyValueErrors }
+      delete newEmptyErrors.TXT
+      setEmptyValueErrors(newEmptyErrors)
+    }
+
     updateData({ records: { ...data.records, TXT: value } })
   }
 
@@ -224,6 +261,15 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       const newErrors = { ...recordErrors }
       delete newErrors[`${type}-${index}`]
       setRecordErrors(newErrors)
+    }
+
+    // Check for empty value
+    if (!value.trim()) {
+      setEmptyValueErrors({ ...emptyValueErrors, [`${type}-${index}`]: true })
+    } else {
+      const newEmptyErrors = { ...emptyValueErrors }
+      delete newEmptyErrors[`${type}-${index}`]
+      setEmptyValueErrors(newEmptyErrors)
     }
 
     updateData({ records: { ...data.records, [type]: newArray } })
@@ -243,6 +289,11 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
     delete newErrors[`${type}-${index}`]
     setRecordErrors(newErrors)
 
+    // Remove empty value error for this item
+    const newEmptyErrors = { ...emptyValueErrors }
+    delete newEmptyErrors[`${type}-${index}`]
+    setEmptyValueErrors(newEmptyErrors)
+
     updateData({ records: { ...data.records, [type]: newArray.length ? newArray : [""] } })
   }
 
@@ -259,6 +310,15 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
         const newErrors = { ...recordErrors }
         delete newErrors[`MX-${index}`]
         setRecordErrors(newErrors)
+      }
+
+      // Check for empty value
+      if (!(value as string).trim()) {
+        setEmptyValueErrors({ ...emptyValueErrors, [`MX-${index}`]: true })
+      } else {
+        const newEmptyErrors = { ...emptyValueErrors }
+        delete newEmptyErrors[`MX-${index}`]
+        setEmptyValueErrors(newEmptyErrors)
       }
     }
 
@@ -278,6 +338,11 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
     const newErrors = { ...recordErrors }
     delete newErrors[`MX-${index}`]
     setRecordErrors(newErrors)
+
+    // Remove empty value error for this item
+    const newEmptyErrors = { ...emptyValueErrors }
+    delete newEmptyErrors[`MX-${index}`]
+    setEmptyValueErrors(newEmptyErrors)
 
     updateData({ records: { ...data.records, MX: newArray.length ? newArray : [{ target: "", priority: 10 }] } })
   }
@@ -300,6 +365,15 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
         delete newErrors[`SRV-${index}`]
         setRecordErrors(newErrors)
       }
+
+      // Check for empty value
+      if (!(value as string).trim()) {
+        setEmptyValueErrors({ ...emptyValueErrors, [`SRV-${index}`]: true })
+      } else {
+        const newEmptyErrors = { ...emptyValueErrors }
+        delete newEmptyErrors[`SRV-${index}`]
+        setEmptyValueErrors(newEmptyErrors)
+      }
     }
 
     updateData({ records: { ...data.records, SRV: newArray } })
@@ -319,6 +393,11 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
     delete newErrors[`SRV-${index}`]
     setRecordErrors(newErrors)
 
+    // Remove empty value error for this item
+    const newEmptyErrors = { ...emptyValueErrors }
+    delete newEmptyErrors[`SRV-${index}`]
+    setEmptyValueErrors(newEmptyErrors)
+
     updateData({
       records: {
         ...data.records,
@@ -330,6 +409,18 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   const handleCAARecordChange = (index: number, field: "flags" | "tag" | "value", value: string | number) => {
     const newArray = [...(data.records.CAA || [{ flags: 0, tag: "issue", value: "" }])]
     newArray[index] = { ...newArray[index], [field]: value }
+
+    // Check for empty value if field is value
+    if (field === "value") {
+      if (!(value as string).trim()) {
+        setEmptyValueErrors({ ...emptyValueErrors, [`CAA-${index}`]: true })
+      } else {
+        const newEmptyErrors = { ...emptyValueErrors }
+        delete newEmptyErrors[`CAA-${index}`]
+        setEmptyValueErrors(newEmptyErrors)
+      }
+    }
+
     updateData({ records: { ...data.records, CAA: newArray } })
   }
 
@@ -341,6 +432,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   const removeCAAItem = (index: number) => {
     const newArray = [...(data.records.CAA || [])]
     newArray.splice(index, 1)
+
+    // Remove empty value error for this item
+    const newEmptyErrors = { ...emptyValueErrors }
+    delete newEmptyErrors[`CAA-${index}`]
+    setEmptyValueErrors(newEmptyErrors)
+
     updateData({
       records: { ...data.records, CAA: newArray.length ? newArray : [{ flags: 0, tag: "issue", value: "" }] },
     })
@@ -353,6 +450,18 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   ) => {
     const newArray = [...(data.records.DS || [{ key_tag: 0, algorithm: 13, digest_type: 2, digest: "" }])]
     newArray[index] = { ...newArray[index], [field]: value }
+
+    // Check for empty value if field is digest
+    if (field === "digest") {
+      if (!(value as string).trim()) {
+        setEmptyValueErrors({ ...emptyValueErrors, [`DS-${index}`]: true })
+      } else {
+        const newEmptyErrors = { ...emptyValueErrors }
+        delete newEmptyErrors[`DS-${index}`]
+        setEmptyValueErrors(newEmptyErrors)
+      }
+    }
+
     updateData({ records: { ...data.records, DS: newArray } })
   }
 
@@ -364,6 +473,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   const removeDSItem = (index: number) => {
     const newArray = [...(data.records.DS || [])]
     newArray.splice(index, 1)
+
+    // Remove empty value error for this item
+    const newEmptyErrors = { ...emptyValueErrors }
+    delete newEmptyErrors[`DS-${index}`]
+    setEmptyValueErrors(newEmptyErrors)
+
     updateData({
       records: {
         ...data.records,
@@ -379,6 +494,18 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   ) => {
     const newArray = [...(data.records.TLSA || [{ usage: 1, selector: 1, matchingType: 1, certificate: "" }])]
     newArray[index] = { ...newArray[index], [field]: value }
+
+    // Check for empty value if field is certificate
+    if (field === "certificate") {
+      if (!(value as string).trim()) {
+        setEmptyValueErrors({ ...emptyValueErrors, [`TLSA-${index}`]: true })
+      } else {
+        const newEmptyErrors = { ...emptyValueErrors }
+        delete newEmptyErrors[`TLSA-${index}`]
+        setEmptyValueErrors(newEmptyErrors)
+      }
+    }
+
     updateData({ records: { ...data.records, TLSA: newArray } })
   }
 
@@ -390,6 +517,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   const removeTLSAItem = (index: number) => {
     const newArray = [...(data.records.TLSA || [])]
     newArray.splice(index, 1)
+
+    // Remove empty value error for this item
+    const newEmptyErrors = { ...emptyValueErrors }
+    delete newEmptyErrors[`TLSA-${index}`]
+    setEmptyValueErrors(newEmptyErrors)
+
     updateData({
       records: {
         ...data.records,
@@ -487,6 +620,107 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
     }
   }
 
+  // Validate all record values before proceeding
+  const validateRecordValues = (): boolean => {
+    const newEmptyValueErrors: Record<string, boolean> = {}
+    let hasEmptyValues = false
+
+    // Check CNAME
+    if (selectedTypes.includes("CNAME") && (!data.records.CNAME || !data.records.CNAME.trim())) {
+      newEmptyValueErrors.CNAME = true
+      hasEmptyValues = true
+    }
+
+    // Check URL
+    if (selectedTypes.includes("URL") && (!data.records.URL || !data.records.URL.trim())) {
+      newEmptyValueErrors.URL = true
+      hasEmptyValues = true
+    }
+
+    // Check TXT
+    if (selectedTypes.includes("TXT") && (!data.records.TXT || !data.records.TXT.trim())) {
+      newEmptyValueErrors.TXT = true
+      hasEmptyValues = true
+    }
+
+    // Check A, AAAA
+    if (selectedTypes.includes("TXT")) {
+      newEmptyValueErrors.TXT = true
+      hasEmptyValues = true
+    }
+
+    // Check A, AAAA, NS
+    for (const type of ["A", "AAAA", "NS"]) {
+      if (selectedTypes.includes(type as RecordType)) {
+        const records = data.records[type] || []
+        records.forEach((value: string, index: number) => {
+          if (!value || !value.trim()) {
+            newEmptyValueErrors[`${type}-${index}`] = true
+            hasEmptyValues = true
+          }
+        })
+      }
+    }
+
+    // Check MX
+    if (selectedTypes.includes("MX")) {
+      const records = data.records.MX || []
+      records.forEach((record: any, index: number) => {
+        if (!record.target || !record.target.trim()) {
+          newEmptyValueErrors[`MX-${index}`] = true
+          hasEmptyValues = true
+        }
+      })
+    }
+
+    // Check SRV
+    if (selectedTypes.includes("SRV")) {
+      const records = data.records.SRV || []
+      records.forEach((record: any, index: number) => {
+        if (!record.target || !record.target.trim()) {
+          newEmptyValueErrors[`SRV-${index}`] = true
+          hasEmptyValues = true
+        }
+      })
+    }
+
+    // Check CAA
+    if (selectedTypes.includes("CAA")) {
+      const records = data.records.CAA || []
+      records.forEach((record: any, index: number) => {
+        if (!record.value || !record.value.trim()) {
+          newEmptyValueErrors[`CAA-${index}`] = true
+          hasEmptyValues = true
+        }
+      })
+    }
+
+    // Check DS
+    if (selectedTypes.includes("DS")) {
+      const records = data.records.DS || []
+      records.forEach((record: any, index: number) => {
+        if (!record.digest || !record.digest.trim()) {
+          newEmptyValueErrors[`DS-${index}`] = true
+          hasEmptyValues = true
+        }
+      })
+    }
+
+    // Check TLSA
+    if (selectedTypes.includes("TLSA")) {
+      const records = data.records.TLSA || []
+      records.forEach((record: any, index: number) => {
+        if (!record.certificate || !record.certificate.trim()) {
+          newEmptyValueErrors[`TLSA-${index}`] = true
+          hasEmptyValues = true
+        }
+      })
+    }
+
+    setEmptyValueErrors(newEmptyValueErrors)
+    return !hasEmptyValues
+  }
+
   const handleNext = () => {
     // Check if at least one record type is selected
     if (selectedTypes.length === 0) {
@@ -496,6 +730,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
 
     // Check for any validation errors
     if (Object.values(recordErrors).some((error) => error && !error.includes("can only be combined"))) {
+      return
+    }
+
+    // Validate that all record values are filled
+    if (!validateRecordValues()) {
+      setNoRecordError("Please fill in all record values before proceeding")
       return
     }
 
@@ -527,10 +767,17 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                     onChange={(e) => handleCNAMEChange(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="example.github.io"
+                    className={emptyValueErrors.CNAME ? "border-destructive" : ""}
                   />
                   <p className="text-sm text-muted-foreground">
                     Enter the hostname that this subdomain should point to (without https:// or trailing slashes).
                   </p>
+                  {emptyValueErrors.CNAME && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>CNAME value is required</AlertDescription>
+                    </Alert>
+                  )}
                   {recordErrors.CNAME && (
                     <Alert variant="destructive" className="mt-2">
                       <AlertCircle className="h-4 w-4" />
@@ -551,7 +798,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                         onChange={(e) => handleArrayRecordChange("A", index, e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="192.0.2.1"
-                        className="flex-1"
+                        className={`flex-1 ${emptyValueErrors[`A-${index}`] ? "border-destructive" : ""}`}
                       />
                       <Button
                         variant="ghost"
@@ -565,6 +812,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                       </Button>
                     </div>
                   ))}
+                  {emptyValueErrors[`A-${(data.records.A || [""]).length - 1}`] && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>A record value is required</AlertDescription>
+                    </Alert>
+                  )}
                   {recordErrors[`A-${(data.records.A || [""]).length - 1}`] && (
                     <Alert variant="destructive" className="mt-2">
                       <AlertCircle className="h-4 w-4" />
@@ -589,7 +842,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                         onChange={(e) => handleArrayRecordChange("AAAA", index, e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="2001:0db8:85a3:0000:0000:8a2e:0370:7334"
-                        className="flex-1"
+                        className={`flex-1 ${emptyValueErrors[`AAAA-${index}`] ? "border-destructive" : ""}`}
                       />
                       <Button
                         variant="ghost"
@@ -603,6 +856,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                       </Button>
                     </div>
                   ))}
+                  {emptyValueErrors[`AAAA-${(data.records.AAAA || [""]).length - 1}`] && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>AAAA record value is required</AlertDescription>
+                    </Alert>
+                  )}
                   {recordErrors[`AAAA-${(data.records.AAAA || [""]).length - 1}`] && (
                     <Alert variant="destructive" className="mt-2">
                       <AlertCircle className="h-4 w-4" />
@@ -629,10 +888,17 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                       onChange={(e) => handleURLChange(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="https://example.com"
+                      className={emptyValueErrors.URL ? "border-destructive" : ""}
                     />
                     <p className="text-sm text-muted-foreground">
                       Enter the URL that visitors should be redirected to.
                     </p>
+                    {emptyValueErrors.URL && (
+                      <Alert variant="destructive" className="mt-2">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>URL value is required</AlertDescription>
+                      </Alert>
+                    )}
                     {recordErrors.URL && (
                       <Alert variant="destructive" className="mt-2">
                         <AlertCircle className="h-4 w-4" />
@@ -712,7 +978,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                         onChange={(e) => handleMXRecordChange(index, "target", e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="mx1.example.com"
-                        className="flex-1"
+                        className={`flex-1 ${emptyValueErrors[`MX-${index}`] ? "border-destructive" : ""}`}
                       />
                       <Button
                         variant="ghost"
@@ -726,6 +992,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                       </Button>
                     </div>
                   ))}
+                  {emptyValueErrors[`MX-${(data.records.MX || []).length - 1}`] && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>MX target is required</AlertDescription>
+                    </Alert>
+                  )}
                   {recordErrors[`MX-${(data.records.MX || []).length - 1}`] && (
                     <Alert variant="destructive" className="mt-2">
                       <AlertCircle className="h-4 w-4" />
@@ -749,10 +1021,17 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                     onChange={(e) => handleTXTChange(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="v=spf1 include:_spf.example.com ~all"
+                    className={emptyValueErrors.TXT ? "border-destructive" : ""}
                   />
                   <p className="text-sm text-muted-foreground">
                     Enter the text record value. This is often used for domain verification.
                   </p>
+                  {emptyValueErrors.TXT && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>TXT value is required</AlertDescription>
+                    </Alert>
+                  )}
                 </div>
               )
 
@@ -773,7 +1052,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                         onChange={(e) => handleArrayRecordChange("NS", index, e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="ns1.example.com"
-                        className="flex-1"
+                        className={`flex-1 ${emptyValueErrors[`NS-${index}`] ? "border-destructive" : ""}`}
                       />
                       <Button
                         variant="ghost"
@@ -787,6 +1066,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                       </Button>
                     </div>
                   ))}
+                  {emptyValueErrors[`NS-${(data.records.NS || [""]).length - 1}`] && (
+                    <Alert variant="destructive" className="mt-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>NS value is required</AlertDescription>
+                    </Alert>
+                  )}
                   {recordErrors[`NS-${(data.records.NS || [""]).length - 1}`] && (
                     <Alert variant="destructive" className="mt-2">
                       <AlertCircle className="h-4 w-4" />
@@ -857,7 +1142,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                               onChange={(e) => handleSRVRecordChange(index, "target", e.target.value)}
                               onKeyDown={handleKeyDown}
                               placeholder="srv.example.com"
-                              className="flex-1"
+                              className={`flex-1 ${emptyValueErrors[`SRV-${index}`] ? "border-destructive" : ""}`}
                             />
                             <Button
                               variant="ghost"
@@ -871,6 +1156,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                             </Button>
                           </div>
                         </div>
+                        {emptyValueErrors[`SRV-${index}`] && (
+                          <Alert variant="destructive" className="mt-2">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>SRV target is required</AlertDescription>
+                          </Alert>
+                        )}
                         {recordErrors[`SRV-${index}`] && (
                           <Alert variant="destructive" className="mt-2">
                             <AlertCircle className="h-4 w-4" />
@@ -933,7 +1224,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                             onChange={(e) => handleCAARecordChange(index, "value", e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="letsencrypt.org"
-                            className="flex-1"
+                            className={`flex-1 ${emptyValueErrors[`CAA-${index}`] ? "border-destructive" : ""}`}
                           />
                           <Button
                             variant="ghost"
@@ -947,6 +1238,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                           </Button>
                         </div>
                       </div>
+                      {emptyValueErrors[`CAA-${index}`] && (
+                        <Alert variant="destructive" className="mt-2">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription>CAA value is required</AlertDescription>
+                        </Alert>
+                      )}
                     </div>
                   ))}
                   <Button variant="outline" onClick={addCAAItem} className="w-full">
@@ -1013,7 +1310,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                               onChange={(e) => handleDSRecordChange(index, "digest", e.target.value)}
                               onKeyDown={handleKeyDown}
                               placeholder="C2074462471B81206F792AEC23469EF33DDC53538E8580DCCC92FD130C9A6096"
-                              className="flex-1"
+                              className={`flex-1 ${emptyValueErrors[`DS-${index}`] ? "border-destructive" : ""}`}
                             />
                             <Button
                               variant="ghost"
@@ -1027,6 +1324,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                             </Button>
                           </div>
                         </div>
+                        {emptyValueErrors[`DS-${index}`] && (
+                          <Alert variant="destructive" className="mt-2">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>DS digest is required</AlertDescription>
+                          </Alert>
+                        )}
                       </div>
                     ),
                   )}
@@ -1094,7 +1397,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                               onChange={(e) => handleTLSARecordChange(index, "certificate", e.target.value)}
                               onKeyDown={handleKeyDown}
                               placeholder="5B2D3A4F5E6B7C8D9E0F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2D3"
-                              className="flex-1"
+                              className={`flex-1 ${emptyValueErrors[`TLSA-${index}`] ? "border-destructive" : ""}`}
                             />
                             <Button
                               variant="ghost"
@@ -1108,6 +1411,12 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                             </Button>
                           </div>
                         </div>
+                        {emptyValueErrors[`TLSA-${index}`] && (
+                          <Alert variant="destructive" className="mt-2">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>TLSA certificate is required</AlertDescription>
+                          </Alert>
+                        )}
                       </div>
                     ),
                   )}
