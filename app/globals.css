@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Monochrome dark theme with purple accent */
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
+  --muted: #313244;
+  --muted-foreground: #a6adc8;
+  --accent: #cba6f7;
+  --accent-foreground: #1e1e2e;
+  --success: #bac2de;
+  --error: #f38ba8;
+
+  /* Theme variables */
+  --header-bg: #1e1e2e;
+  --body-fg: #cdd6f4;
+  --hover-bg: #313244;
+  --hover-accent: #d9bcff;
+
+  /* UI variables */
+  --card: #181825;
+  --card-foreground: #cdd6f4;
+  --popover: #181825;
+  --popover-foreground: #cdd6f4;
+  --primary: #cba6f7;
+  --primary-foreground: #1e1e2e;
+  --secondary: #313244;
+  --secondary-foreground: #cdd6f4;
+  --destructive: #f38ba8;
+  --destructive-foreground: #1e1e2e;
+  --border: #313244;
+  --input: #313244;
+  --ring: #cba6f7;
+  --radius: 0.5rem;
+  --orangc: #fab387;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.bg-header {
+  background: var(--header-bg);
+}
+
+.text-orangc {
+  color: var(--orangc);
+}
+
+/* Improved card styling */
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Improved button styling */
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  transition: all 0.2s ease;
+}
+
+.btn-accent:hover {
+  background-color: var(--hover-accent);
+  transform: translateY(-1px);
+}
+
+/* Improved form elements */
+input,
+select,
+textarea {
+  background-color: var(--input) !important;
+  border-color: var(--border) !important;
+  color: var(--body-fg) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(243, 139, 168, 0.25) !important;
+}
+
+/* Code block styling */
+pre {
+  background-color: #11111b !important;
+  border: 1px solid var(--border) !important;
+}
+
+code {
+  color: var(--foreground) !important;
+}
+
+/* Alert styling */
+.alert-success {
+  background-color: var(--success) !important;
+  color: var(--background) !important;
+}
+
+.alert-error {
+  background-color: var(--error) !important;
+  color: var(--background) !important;
+}
+
+/* Override shadcn components */
+.bg-background {
+  background-color: var(--background) !important;
+}
+
+.text-foreground {
+  color: var(--foreground) !important;
+}
+
+.bg-card {
+  background-color: var(--card) !important;
+}
+
+.text-card-foreground {
+  color: var(--card-foreground) !important;
+}
+
+.bg-popover {
+  background-color: var(--popover) !important;
+}
+
+.text-popover-foreground {
+  color: var(--popover-foreground) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary) !important;
+}
+
+.text-primary-foreground {
+  color: var(--primary-foreground) !important;
+}
+
+.bg-secondary {
+  background-color: var(--secondary) !important;
+}
+
+.text-secondary-foreground {
+  color: var(--secondary-foreground) !important;
+}
+
+.bg-muted {
+  background-color: var(--muted) !important;
+}
+
+.text-muted-foreground {
+  color: var(--muted-foreground) !important;
+}
+
+.bg-accent {
+  background-color: var(--accent) !important;
+}
+
+.text-accent-foreground {
+  color: var(--accent-foreground) !important;
+}
+
+.bg-destructive {
+  background-color: var(--destructive) !important;
+}
+
+.text-destructive-foreground {
+  color: var(--destructive-foreground) !important;
+}
+
+.border-border {
+  border-color: var(--border) !important;
+}
+
+/* Force dark theme on all components */
+.dark {
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
+}
+
+/* Ensure buttons have correct colors */
+button {
+  background-color: var(--secondary);
+  color: var(--foreground);
+}
+
+button:hover {
+  background-color: var(--hover-bg);
+}
+
+button.bg-accent,
+button.bg-primary {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+button.bg-accent:hover,
+button.bg-primary:hover {
+  background-color: var(--hover-accent) !important;
+}
+
+/* Switch component styling */
+.switch {
+  background-color: var(--muted) !important;
+  border-color: var(--border) !important;
+}
+
+.switch[data-state="checked"] {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+.switch[data-state="checked"] .switch-thumb {
+  background-color: var(--accent-foreground) !important;
+}
