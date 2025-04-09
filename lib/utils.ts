@@ -5,8 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Update the isValidDomain function to allow dots for nested subdomains
 export async function isValidDomain(domain: string): Promise<boolean> {
-  const pattern = /^(?!.*--)[a-z0-9-]+$/
+  // Allow alphanumeric, dashes, and dots, but not at the beginning or end
+  // and no consecutive dashes or dots
+  const pattern = /^(?!.*--)(?!.*\.\.)[a-z0-9][a-z0-9.-]*[a-z0-9]$|^[a-z0-9]$/
   return pattern.test(domain)
 }
 
@@ -28,17 +31,38 @@ export async function checkSubdomainAvailability(subdomain: string): Promise<boo
     const data = await response.json()
 
     // Check if the subdomain exists in the data
-    for (const entry of data) {
-      if (
+    const subdomainExists = data.some(
+      (entry: any) =>
         entry.domain?.removeSuffix?.(".is-a.dev") === subdomain ||
         entry.domain === subdomain ||
-        entry.domain === `${subdomain}.is-a.dev`
-      ) {
-        return false // Subdomain is taken
+        entry.domain === `${subdomain}.is-a.dev`,
+    )
+
+    // If the subdomain already exists, it's not available
+    if (subdomainExists) {
+      return false
+    }
+
+    // For nested subdomains, check if the parent domain exists
+    if (subdomain.includes(".")) {
+      const parentDomain = subdomain.split(".").slice(1).join(".")
+
+      // Parent domain must exist for nested subdomains
+      const parentExists = data.some(
+        (entry: any) =>
+          entry.domain?.removeSuffix?.(".is-a.dev") === parentDomain ||
+          entry.domain === parentDomain ||
+          entry.domain === `${parentDomain}.is-a.dev`,
+      )
+
+      // If parent doesn't exist, the nested subdomain can't be registered
+      if (!parentExists) {
+        return false
       }
     }
 
-    return true // Subdomain is available
+    // If we get here, the subdomain is available
+    return true
   } catch (error) {
     console.error("Error checking subdomain availability:", error)
     // In case of error, we'll assume the subdomain is not available

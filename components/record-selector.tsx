@@ -29,6 +29,9 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
   const [noRecordError, setNoRecordError] = useState<string | null>(null)
   const [emptyValueErrors, setEmptyValueErrors] = useState<Record<string, boolean>>({})
 
+  // Check if proxy-eligible record types are selected (A, AAAA, CNAME)
+  const hasProxyEligibleRecords = selectedTypes.some((type) => ["A", "AAAA", "CNAME", "URL"].includes(type))
+
   // Initialize selected types from data
   useEffect(() => {
     const types: RecordType[] = []
@@ -67,6 +70,13 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       setShowRedirectConfig(true)
     }
   }, [selectedTypes])
+
+  // Disable proxied if no proxy-eligible records are selected
+  useEffect(() => {
+    if (!hasProxyEligibleRecords && data.proxied) {
+      updateData({ proxied: false })
+    }
+  }, [hasProxyEligibleRecords, data.proxied])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -1466,10 +1476,13 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
             </div>
           </ScrollArea>
 
-          <div className="flex items-center space-x-2 pt-4">
-            <Switch id="proxied" checked={data.proxied} onCheckedChange={toggleProxied} className="switch" />
-            <Label htmlFor="proxied">Enable Cloudflare proxy</Label>
-          </div>
+          {/* Only show proxy toggle if A, AAAA, or CNAME records are selected */}
+          {hasProxyEligibleRecords && (
+            <div className="flex items-center space-x-2 pt-4">
+              <Switch id="proxied" checked={data.proxied} onCheckedChange={toggleProxied} className="switch" />
+              <Label htmlFor="proxied">Enable Cloudflare proxy</Label>
+            </div>
+          )}
 
           {recordErrors.NS && (
             <Alert variant="destructive" className="mt-4">

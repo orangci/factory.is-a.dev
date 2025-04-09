@@ -66,6 +66,7 @@ export function SubdomainChecker() {
     }
   }, [debouncedSubdomain])
 
+  // Update the validateSubdomainFormat function to allow nested subdomains
   const validateSubdomainFormat = async (subdomain: string): Promise<boolean> => {
     // Check if subdomain is at least 1 character
     if (subdomain.length < 1) {
@@ -74,8 +75,8 @@ export function SubdomainChecker() {
       return false
     }
 
-    // Check if subdomain is alphanumeric, lowercase with optional dashes
-    const pattern = /^(?!.*--)[a-z0-9-.]+$/
+    // Check if subdomain is alphanumeric, lowercase with optional dashes and dots
+    const pattern = /^(?!.*--)[a-z0-9.-]+$/
     if (!pattern.test(subdomain)) {
       setError("The subdomain name must be alphanumeric, lowercase, and may contain dashes.")
       setIsAvailable(null)
@@ -89,7 +90,14 @@ export function SubdomainChecker() {
       return false
     }
 
-    // Check if subdomain contains consecutive dots (for nested subdomains)
+    // Check if subdomain starts or ends with a dot
+    if (subdomain.startsWith(".") || subdomain.endsWith(".")) {
+      setError("The subdomain name must not start or end with a dot.")
+      setIsAvailable(null)
+      return false
+    }
+
+    // Check if subdomain contains consecutive dots
     if (subdomain.includes("..")) {
       setError("The subdomain name must not contain consecutive dots.")
       setIsAvailable(null)
@@ -99,13 +107,6 @@ export function SubdomainChecker() {
     // Check if subdomain contains consecutive dashes
     if (subdomain.includes("--")) {
       setError("The subdomain name must not contain consecutive dashes.")
-      setIsAvailable(null)
-      return false
-    }
-
-    // Check if subdomain starts with a dot
-    if (subdomain.startsWith(".")) {
-      setError("The subdomain name must not start with a dot.")
       setIsAvailable(null)
       return false
     }
@@ -141,6 +142,30 @@ export function SubdomainChecker() {
       // Check if subdomain is available
       const available = await checkSubdomainAvailability(data.subdomain)
       setIsAvailable(available)
+
+      // If it's a nested subdomain and not available, provide a more specific error
+      if (!available && data.subdomain.includes(".")) {
+        const parentDomain = data.subdomain.split(".").slice(1).join(".")
+
+        // Fetch data to check if parent exists
+        const response = await fetch("https://raw.is-a.dev")
+        const domainData = await response.json()
+
+        const parentExists = domainData.some(
+          (entry: any) =>
+            entry.domain?.removeSuffix?.(".is-a.dev") === parentDomain ||
+            entry.domain === parentDomain ||
+            entry.domain === `${parentDomain}.is-a.dev`,
+        )
+
+        if (!parentExists) {
+          setError(
+            `The parent domain '${parentDomain}' does not exist. For nested subdomains, the parent must already be registered.`,
+          )
+        } else {
+          setError("This subdomain is not available for registration.")
+        }
+      }
 
       if (available && shouldProceed) {
         setTimeout(() => setCurrentStep("userInfo"), 500)
@@ -242,7 +267,7 @@ export function SubdomainChecker() {
                 </Alert>
               )}
 
-              {isAvailable === false && (
+              {isAvailable === false && !error && (
                 <Alert variant="destructive" className="mt-4">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>This subdomain is not available for registration!</AlertDescription>
