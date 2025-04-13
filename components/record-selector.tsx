@@ -1052,7 +1052,7 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
                   <Alert className="mb-4 bg-accent/20 text-body-fg border-accent">
                     <AlertCircle className="h-4 w-4 text-accent" />
                     <AlertDescription>
-                      A valid reason must be provided in order for NS record requests to be approved. Read <a href="https://docs.is-a.dev/faq/#who-can-use-ns-records">here</a> to see who are eligible to use NS records.
+                      A valid reason must be provided in order for NS record requests to be approved. Read <u><a href="https://docs.is-a.dev/faq/#who-can-use-ns-records">here</a></u> to see who are eligible to use NS records.
                     </AlertDescription>
                   </Alert>
                   {(data.records.NS || [""]).map((value: string, index: number) => (
