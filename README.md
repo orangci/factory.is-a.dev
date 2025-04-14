@@ -1,4 +1,4 @@
-### factory.is-a.dev
+### factory.is-a.dev v1.0.0
 
 A webpage for generating [is-a.dev](https://is-a.dev) subdomain JSON files. Built with Next.js, Tailwind CSS, and shadcn/ui. The official instance of this project is hosted on Vercel [here](https://factory.is-a.dev).
 
@@ -65,8 +65,11 @@ pnpm start
 Contributions are welcome! Please feel free to submit a pull request.
 
 ## License
+- [GNU AGPLv3](./LICENSE)
 
-[GNU GPL V3](./LICENSE)
+## Specifications
+- This project follows [Semantic Versioning 2.0.0](https://semver.org/) specification.
+- This project follows the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
 ## Afternote
 
