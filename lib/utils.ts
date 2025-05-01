@@ -27,7 +27,7 @@ export async function checkSubdomainAvailability(subdomain: string): Promise<boo
     }
 
     // Fetch data from the raw.is-a.dev endpoint
-    const response = await fetch("https://raw.is-a.dev")
+    const response = await fetch("https://raw.is-a.dev/v2.json")
     const data = await response.json()
 
     // Check if the subdomain exists in the data

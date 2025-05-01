@@ -46,9 +46,9 @@ export function JsonPreview({ data, onBack }: JsonPreviewProps) {
     // Add owner
     jsonObj.owner = owner
 
-    // Only add record if there are records
+    // Only add records if there are records
     if (Object.keys(records).length > 0) {
-      jsonObj.record = records
+      jsonObj.records = records
     }
 
     if (proxied) {

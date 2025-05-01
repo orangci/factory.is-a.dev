@@ -148,7 +148,7 @@ export function SubdomainChecker() {
         const parentDomain = data.subdomain.split(".").slice(1).join(".")
 
         // Fetch data to check if parent exists
-        const response = await fetch("https://raw.is-a.dev")
+        const response = await fetch("https://raw.is-a.dev/v2.json")
         const domainData = await response.json()
 
         const parentExists = domainData.some(
