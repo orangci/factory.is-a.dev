@@ -653,12 +653,6 @@ export function RecordSelector({ data, updateData, onNext, onBack }: RecordSelec
       hasEmptyValues = true
     }
 
-    // Check A, AAAA
-    if (selectedTypes.includes("TXT")) {
-      newEmptyValueErrors.TXT = true
-      hasEmptyValues = true
-    }
-
     // Check A, AAAA, NS
     for (const type of ["A", "AAAA", "NS"]) {
       if (selectedTypes.includes(type as RecordType)) {
